@@ -1,90 +1,98 @@
-Bài tập HDH Nhúng: Xây dựng U-Boot và Kernel
+<div align="center">
 
-Phần 1: Biên dịch và Cài đặt U-Boot
-1.1. Thiết lập môi trường
-Export biến môi trường trỏ đến Toolchain đã tạo:
+# Embedded Linux: U-Boot & Kernel Porting
+### Bài tập Hệ điều hành Nhúng trên BeagleBone Black
 
-Bash
-export ARCH=arm
-export CROSS_COMPILE=/path/to/your/custom/toolchain/bin/arm-custom-linux-gnueabi-
-1.2. Biên dịch U-Boot
-Sử dụng cấu hình mặc định cho BeagleBone Black (am335x_evm_defconfig):
+![Platform](https://img.shields.io/badge/Platform-BeagleBone%20Black-black?logo=linux&logoColor=white)
+![Kernel](https://img.shields.io/badge/Kernel-Linux%20Mainline-yellow)
+![Bootloader](https://img.shields.io/badge/U--Boot-202x-blue)
+![Status](https://img.shields.io/badge/Status-Completed-success)
 
-Bash
+</div>
+
+---
+
+## Tổng quan (Overview)
+Dự án này thực hiện quy trình xây dựng một hệ thống nhúng Linux cơ bản từ mã nguồn (from scratch). Mục tiêu bao gồm biên dịch Bootloader (U-Boot), Linux Kernel và nạp chúng lên bo mạch BeagleBone Black (BBB) để kiểm chứng quá trình khởi động phần cứng.
+
+### Yêu cầu đạt được
+1.  **U-Boot:** Biên dịch và chạy thành công trên phần cứng thật (qua thẻ nhớ SD).
+2.  **Kernel:** Load nhân Linux vào RAM và chuyển quyền điều khiển từ U-Boot sang Kernel.
+
+---
+
+## Phần 1: U-Boot (Bootloader)
+
+### 1.1. Biên dịch (Compilation)
+Sử dụng Cross-Compiler Toolchain đã được cấu hình trước đó để build U-Boot.
+
+| File đầu ra | Mô tả |
+| :--- | :--- |
+| `MLO` | Secondary Program Loader (Chạy trước). |
+| `u-boot.img` | Main Bootloader (Giao diện dòng lệnh). |
+
+```bash
+# Clean project
 make distclean
+
+# Cấu hình cho BBB
 make am335x_evm_defconfig
+
+# Biên dịch
 make -j4
-Kết quả đầu ra: Sau khi biên dịch thành công, hai file quan trọng được tạo ra:
+1.2. Cài đặt lên thẻ nhớ (Installation)
+Thẻ nhớ được chia phân vùng Boot (FAT32). Các file cần được copy theo thứ tự nghiêm ngặt:
 
-MLO (Secondary Program Loader)
+Copy MLO (Bắt buộc copy đầu tiên).
 
-u-boot.img (Main Bootloader)
+Copy u-boot.img.
 
-1.3. Chuẩn bị thẻ nhớ (SD Card)
-Phân vùng thẻ nhớ (ví dụ /dev/sdb) thành phân vùng boot (FAT32/FAT16) và cài đặt U-Boot:
+1.3. Kiểm thử (Verification)
+Kết nối BBB với máy tính qua UART (USB-TTL) và sử dụng Terminal (Putty/Minicom).
 
-Format phân vùng boot định dạng FAT.
+Kết quả mong đợi:
 
-Copy file vào thẻ nhớ:
+[x] Hiển thị đúng phiên bản U-Boot (Build date).
 
-Bash
-cp MLO /media/user/BOOT/
-cp u-boot.img /media/user/BOOT/
-(Lưu ý: MLO phải được copy trước)
+[x] Hiển thị thông tin phần cứng (DRAM: 512 MiB, MMC,...).
 
-1.4. Kiểm thử U-Boot (Debug qua UART)
-Cắm thẻ nhớ vào BBB -> Nhấn giữ nút Boot (S2) -> Cấp nguồn.
+[x] Gõ lệnh tương tác được với hệ thống.
 
-Kết quả trên Terminal:
-
-[x] Hiển thị phiên bản U-Boot (Build date/time).
-
-[x] Hiển thị thông tin phần cứng (CPU, Board model, DRAM size).
-
-[x] Dấu nhắc lệnh => xuất hiện, gõ lệnh version hoặc bdinfo có phản hồi.
-
-Phần 2: Biên dịch và Cài đặt Kernel
+Phần 2: Linux Kernel
 2.1. Biên dịch Kernel
-Sử dụng cùng Toolchain với U-Boot để đảm bảo tính đồng nhất.
+Sử dụng Toolchain đồng nhất với U-Boot. Quá trình tạo ra 2 thành phần:
+
+zImage: Nhân hệ điều hành (Compressed Kernel Image).
+
+am335x-boneblack.dtb: Cấu hình phần cứng (Device Tree Blob).
 
 Bash
-# Cấu hình cho BBB (thường dùng bb.org_defconfig hoặc multi_v7_defconfig)
-make bb.org_defconfig
-
-# Biên dịch Kernel image và Device Tree Blobs
+# Biên dịch Kernel & DTB
 make -j4 zImage dtbs
-Kết quả đầu ra:
+2.2. Boot Kernel từ U-Boot
+Sau khi copy zImage và file .dtb vào thẻ nhớ, thực hiện các bước sau trên giao diện U-Boot:
 
-arch/arm/boot/zImage
-
-arch/arm/boot/dts/am335x-boneblack.dtb
-
-2.2. Đưa file vào thẻ nhớ
-Copy 2 file vừa tạo vào cùng phân vùng với U-Boot trên thẻ nhớ:
-
+Bước 1: Load file vào RAM
 Bash
-cp arch/arm/boot/zImage /media/user/BOOT/
-cp arch/arm/boot/dts/am335x-boneblack.dtb /media/user/BOOT/
-2.3. Khởi động Kernel từ U-Boot (lệnh bootz)
-Khởi động lại BBB, nhấn phím bất kỳ để dừng ở U-Boot =>.
-
-Nạp Kernel và DTB vào RAM (Địa chỉ vật lý của BBB):
-
-Bash
-# Load zImage vào địa chỉ 0x82000000
+# Load Kernel vào địa chỉ 0x82000000
 load mmc 0:1 0x82000000 zImage
 
 # Load DTB vào địa chỉ 0x88000000
 load mmc 0:1 0x88000000 am335x-boneblack.dtb
-Khởi động Kernel:
-
+Bước 2: Khởi động (Bootz)
 Bash
 bootz 0x82000000 - 0x88000000
-2.4. Kết quả khởi động Kernel
-Quan sát trên màn hình Terminal:
+Kết quả thực nghiệm
+Sau khi gõ lệnh bootz, hệ thống hiển thị log khởi động của Linux:
 
-[x] Thông báo Starting kernel ... xuất hiện.
+Starting kernel ... (U-Boot đã chuyển quyền thành công).
 
-[x] Log khởi động của Linux Kernel hiển thị (phiên bản Linux, CPU init, Memory map).
+Linux version... (Hiển thị đúng phiên bản đã build).
 
-[x] Hệ thống dừng lại ở dòng trạng thái chờ rootfs (ví dụ: Waiting for root device... hoặc Kernel panic - not syncing: VFS: Unable to mount root fs) -> Thành công bước nạp Kernel.
+CPU/Memory: Nhận diện đúng CPU ARM Cortex-A8.
+
+Trạng thái cuối: Hệ thống dừng lại và chờ nạp Root Filesystem (Waiting for root device...).
+
+Kết luận: Hoàn thành xuất sắc yêu cầu nạp U-Boot và Kernel lên phần cứng thật.
+
+<div align="center">
