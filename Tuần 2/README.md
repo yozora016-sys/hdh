@@ -35,14 +35,14 @@ make am335x_evm_defconfig
 # Biên dịch
 make -j4
 ```
-###1.2. Cài đặt lên thẻ nhớ (Installation)
+### 1.2. Cài đặt lên thẻ nhớ (Installation)
 Thẻ nhớ được chia phân vùng Boot (FAT32). Các file cần được copy theo thứ tự nghiêm ngặt:
 
 Copy MLO (Bắt buộc copy đầu tiên).
 
 Copy u-boot.img.
 
-###1.3. Kiểm thử (Verification)
+### 1.3. Kiểm thử (Verification)
 Kết nối BBB với máy tính qua UART (USB-TTL) và sử dụng Terminal (Putty/Minicom).
 
 Kết quả mong đợi:
@@ -53,8 +53,8 @@ Kết quả mong đợi:
 
 [x] Gõ lệnh tương tác được với hệ thống.
 
-##Phần 2: Linux Kernel
-###2.1. Biên dịch Kernel
+## Phần 2: Linux Kernel
+### 2.1. Biên dịch Kernel
 Sử dụng Toolchain đồng nhất với U-Boot. Quá trình tạo ra 2 thành phần:
 
 zImage: Nhân hệ điều hành (Compressed Kernel Image).
@@ -65,7 +65,7 @@ am335x-boneblack.dtb: Cấu hình phần cứng (Device Tree Blob).
 # Biên dịch Kernel & DTB
 make -j4 zImage dtbs
 ```
-###2.2. Boot Kernel từ U-Boot
+### 2.2. Boot Kernel từ U-Boot
 Sau khi copy zImage và file .dtb vào thẻ nhớ, thực hiện các bước sau trên giao diện U-Boot:
 Bước 1: Setup môi trường
 ```bash
