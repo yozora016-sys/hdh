@@ -1,6 +1,6 @@
 <div align="center">
 
-# Embedded Linux: U-Boot & Kernel Porting
+# Embedded Linux: U-Boot & Kernel 
 ### Bài tập Hệ điều hành Nhúng trên BeagleBone Black
 
 ![Platform](https://img.shields.io/badge/Platform-BeagleBone%20Black-black?logo=linux&logoColor=white)
@@ -95,4 +95,3 @@ Trạng thái cuối: Hệ thống dừng lại và chờ nạp Root Filesystem 
 
 Kết luận: Hoàn thành xuất sắc yêu cầu nạp U-Boot và Kernel lên phần cứng thật.
 
-<div align="center">
