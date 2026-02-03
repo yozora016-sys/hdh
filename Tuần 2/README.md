@@ -10,8 +10,8 @@
 Dự án này thực hiện quy trình xây dựng một hệ thống nhúng Linux cơ bản từ mã nguồn (from scratch). Mục tiêu bao gồm biên dịch Bootloader (U-Boot), Linux Kernel và nạp chúng lên bo mạch BeagleBone Black (BBB) để kiểm chứng quá trình khởi động phần cứng.
 
 ### Yêu cầu đạt được
-1.  **U-Boot:** Biên dịch và chạy thành công trên phần cứng thật (qua thẻ nhớ SD).
-2.  **Kernel:** Load nhân Linux vào RAM và chuyển quyền điều khiển từ U-Boot sang Kernel.
+1.  **U-Boot:** Khởi tạo U-boot thành công.
+2.  **Kernel:** Kernel khởi động thành công.
 
 ---
 
