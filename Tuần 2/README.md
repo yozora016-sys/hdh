@@ -67,6 +67,7 @@ make -j4 zImage dtbs
 ```
 ### 2.2. Boot Kernel từ U-Boot
 Sau khi copy zImage và file .dtb vào thẻ nhớ, thực hiện các bước sau trên giao diện U-Boot:
+
 Bước 1: Setup môi trường
 ```bash
 setenv bootargs console=ttyS0,115200n8
