@@ -1,12 +1,6 @@
 <div align="center">
 
-# Embedded Linux: U-Boot & Kernel 
-### Bài tập Hệ điều hành Nhúng trên BeagleBone Black
-
-![Platform](https://img.shields.io/badge/Platform-BeagleBone%20Black-black?logo=linux&logoColor=white)
-![Kernel](https://img.shields.io/badge/Kernel-Linux%20Mainline-yellow)
-![Bootloader](https://img.shields.io/badge/U--Boot-202x-blue)
-![Status](https://img.shields.io/badge/Status-Completed-success)
+# Bài tập Hệ điều hành Nhúng: U-Boot & Kernel 
 
 </div>
 
@@ -40,6 +34,7 @@ make am335x_evm_defconfig
 
 # Biên dịch
 make -j4
+```
 1.2. Cài đặt lên thẻ nhớ (Installation)
 Thẻ nhớ được chia phân vùng Boot (FAT32). Các file cần được copy theo thứ tự nghiêm ngặt:
 
@@ -66,22 +61,28 @@ zImage: Nhân hệ điều hành (Compressed Kernel Image).
 
 am335x-boneblack.dtb: Cấu hình phần cứng (Device Tree Blob).
 
-Bash
+```Bash
 # Biên dịch Kernel & DTB
 make -j4 zImage dtbs
+```
 2.2. Boot Kernel từ U-Boot
 Sau khi copy zImage và file .dtb vào thẻ nhớ, thực hiện các bước sau trên giao diện U-Boot:
-
-Bước 1: Load file vào RAM
-Bash
+Bước 1: Setup môi trường
+```bash
+setenv bootargs console=ttyS0,115200n8
+```
+Bước 2: Load file vào RAM
+```Bash
 # Load Kernel vào địa chỉ 0x82000000
 load mmc 0:1 0x82000000 zImage
 
 # Load DTB vào địa chỉ 0x88000000
 load mmc 0:1 0x88000000 am335x-boneblack.dtb
-Bước 2: Khởi động (Bootz)
-Bash
+```
+Bước 3: Khởi động (Bootz)
+```Bash
 bootz 0x82000000 - 0x88000000
+```
 Kết quả thực nghiệm
 Sau khi gõ lệnh bootz, hệ thống hiển thị log khởi động của Linux:
 
@@ -91,7 +92,7 @@ Linux version... (Hiển thị đúng phiên bản đã build).
 
 CPU/Memory: Nhận diện đúng CPU ARM Cortex-A8.
 
-Trạng thái cuối: Hệ thống dừng lại và chờ nạp Root Filesystem (Waiting for root device...).
+Trạng thái cuối: Hệ thống dừng lại và chờ nạp Root Filesystem 
 
-Kết luận: Hoàn thành xuất sắc yêu cầu nạp U-Boot và Kernel lên phần cứng thật.
+Kết luận: Hoàn thành yêu cầu nạp U-Boot và Kernel lên phần cứng thật.
 
