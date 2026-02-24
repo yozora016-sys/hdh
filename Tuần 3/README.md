@@ -23,7 +23,6 @@ Dự án yêu cầu hoàn thành các tiêu chí sau:
 ### Bước 1: Biên dịch RootFS với BusyBox
 1. Tải và giải nén mã nguồn BusyBox.
 2. Cấu hình BusyBox (Sử dụng `make ARCH=arm CROSS_COMPILE=... menuconfig`).
-   * *Lưu ý: Thường chọn cấu hình biên dịch tĩnh (Build static binary) nếu chưa cài đặt thư viện chia sẻ (shared libraries).*
 3. Tiến hành biên dịch và cài đặt (`make install`). Thư mục `_install` sẽ chứa các file RootFS cơ bản.
 
 ### Bước 2: Chuyển dữ liệu vào thẻ nhớ
@@ -56,3 +55,4 @@ ls
 echo
 cat
 ```
+
