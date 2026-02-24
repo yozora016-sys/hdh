@@ -70,7 +70,8 @@ sudo cfdisk /dev/sdb
 ```
 Tạo Phân vùng 2 (RootFS):
 [New] -> Size: Còn lại -> [Primary] -> [Type]: Linux.
-Format phân vùng 2 
+
+Format phân vùng 2.
 ```bash
 sudo mkfs.ext4 -L rootfs /dev/sdb2
 ```
@@ -111,6 +112,7 @@ ls
 echo
 cat
 ```
+
 
 
 
