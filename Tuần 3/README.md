@@ -107,11 +107,18 @@ Khi thấy dòng này ngĩa là đã nạp thành công
 Please press Enter to activate this console.
 ```
 2. Dùng thử các lệnh
-```bash
+
 ls
 echo
 cat
+```bash
+ls -la
+
+echo "Hello Embedded World!"
+
+cat /proc/version
 ```
+
 
 
 
