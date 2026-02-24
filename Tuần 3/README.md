@@ -23,8 +23,42 @@ Dự án yêu cầu hoàn thành các tiêu chí sau:
 ### Bước 1: Biên dịch RootFS với BusyBox
 1. Tải và giải nén mã nguồn BusyBox.
 2. Cấu hình BusyBox (Sử dụng `make ARCH=arm CROSS_COMPILE=... menuconfig`).
-3. Tiến hành biên dịch và cài đặt (`make install`). Thư mục `_install` sẽ chứa các file RootFS cơ bản.
+3. Tạo thư mục chứa rootfs.
+```bash
+cd ~
+mkdir my_rootfs
+cd my_rootfs
 
+```
+4. Copy file `_install` trong BusyBox sang thư mục rootfs.
+```bash
+cp -a ~/embedded-linux/tinysystem/busybox/_install/* .
+```
+5. Tạo các thư mục hệ thống còn thiếu.
+```bash
+mkdir -p dev proc sys etc tmp lib usr/lib var/log home/root
+```
+6. Tạo file cấu hình khởi động /etc/inittab.
+Copy nội dung này vào file inittab
+```bash
+::sysinit:/etc/init.d/rcS
+::askfirst:-/bin/sh
+::restart:/sbin/init
+::ctrlaltdel:/sbin/reboot
+::shutdown:/bin/umount -a -r
+```
+7. Tạo kịch bản khởi động /etc/init.d/rcS
+Tạo file /etc/init.d/rcS và copy nội dung này
+```bash
+#!/bin/sh
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+/bin/echo "Chuc mung! RootFS da khoi dong thanh cong!"
+```
+Lưu lại, cấp quyền thực thi
+```bash
+chmod +x etc/init.d/rcS
+```
 ### Bước 2: Chuyển dữ liệu vào thẻ nhớ
 1. Phân vùng thẻ nhớ (Sử dụng `fdisk` hoặc `gparted`), tạo ít nhất một phân vùng định dạng `ext4` cho RootFS.
 2. Tạo các thư mục hệ thống cơ bản cần thiết (như `/dev`, `/proc`, `/sys`, `/etc`, `/lib`, ...).
@@ -60,5 +94,6 @@ ls
 echo
 cat
 ```
+
 
 
