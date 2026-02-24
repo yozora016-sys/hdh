@@ -39,7 +39,8 @@ cp -a ~/embedded-linux/tinysystem/busybox/_install/* .
 mkdir -p dev proc sys etc tmp lib usr/lib var/log home/root
 ```
 6. Tạo file cấu hình khởi động /etc/inittab.
- Copy nội dung này vào file inittab.
+   
+Copy nội dung này vào file inittab.
 ```bash
 ::sysinit:/etc/init.d/rcS
 ::askfirst:-/bin/sh
@@ -63,10 +64,16 @@ chmod +x etc/init.d/rcS
 ```
 ### Bước 2: Chuyển dữ liệu vào thẻ nhớ
 1. Phân vùng thẻ nhớ , tạo ít nhất một phân vùng định dạng `ext4` cho RootFS.
-Mở công cụ phân vùng: `sudo cfdisk /dev/sdb`
+Mở công cụ phân vùng:
+```bash
+sudo cfdisk /dev/sdb
+```
 Tạo Phân vùng 2 (RootFS):
 [New] -> Size: Còn lại -> [Primary] -> [Type]: Linux.
-Format phân vùng 2 `sudo mkfs.ext4 -L rootfs /dev/sdb2`
+Format phân vùng 2 
+```bash
+sudo mkfs.ext4 -L rootfs /dev/sdb2
+```
 3. Chép RootFS vào phân vùng 2 của thẻ nhớ.
 ```bash
 sudo mount /dev/sdb2 /mnt
@@ -104,6 +111,7 @@ ls
 echo
 cat
 ```
+
 
 
 
