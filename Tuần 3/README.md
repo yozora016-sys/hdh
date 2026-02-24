@@ -47,30 +47,40 @@ mkdir -p dev proc sys etc tmp lib usr/lib var/log home/root
 ::ctrlaltdel:/sbin/reboot
 ::shutdown:/bin/umount -a -r
 ```
-7. Tạo kịch bản khởi động /etc/init.d/rcS.
- Tạo file /etc/init.d/rcS và copy nội dung này.
+7. Tạo kịch bản khởi động.
+
+Tạo file /etc/init.d/rcS và copy nội dung này.
 ```bash
 #!/bin/sh
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 /bin/echo "Chuc mung! RootFS da khoi dong thanh cong!"
 ```
- Lưu lại, cấp quyền thực thi.
+
+Lưu lại, cấp quyền thực thi.
 ```bash
 chmod +x etc/init.d/rcS
 ```
 ### Bước 2: Chuyển dữ liệu vào thẻ nhớ
-1. Phân vùng thẻ nhớ (Sử dụng `fdisk` hoặc `gparted`), tạo ít nhất một phân vùng định dạng `ext4` cho RootFS.
-2. Tạo các thư mục hệ thống cơ bản cần thiết (như `/dev`, `/proc`, `/sys`, `/etc`, `/lib`, ...).
-3. Copy toàn bộ nội dung từ thư mục `_install` của BusyBox vào phân vùng RootFS trên thẻ nhớ.
-4. Đảm bảo quyền (permissions) và chủ sở hữu (ownership) đúng chuẩn (`sudo chown -R root:root`).
+1. Phân vùng thẻ nhớ , tạo ít nhất một phân vùng định dạng `ext4` cho RootFS.
+Mở công cụ phân vùng: `sudo cfdisk /dev/sdb`
+Tạo Phân vùng 2 (RootFS):
+[New] -> Size: Còn lại -> [Primary] -> [Type]: Linux.
+Format phân vùng 2 `sudo mkfs.ext4 -L rootfs /dev/sdb2`
+3. Chép RootFS vào phân vùng 2 của thẻ nhớ.
 ```bash
 sudo mount /dev/sdb2 /mnt
 sudo cp -a ~/my_rootfs/* /mnt/
 sudo sync
 sudo umount /mnt
 ```
-### Bước 3: Cấu hình `bootargs` để liên kết Kernel
+### Bước 3: Cấu hình `bootargs` để liên kết Kernel.
+
+
+Mở cổng giao tiếp với BBB.
+```bash
+sudo picocom -b 115200 /dev/ttyUSB0
+```
 Trong giao diện dòng lệnh của Bootloader (thường là U-Boot), tiến hành thiết lập biến `bootargs`:
 ```bash
 setenv bootargs console=ttyO0,115200n8 root=/dev/mmcblk0p2 rootfstype=ext4 rw
@@ -94,6 +104,7 @@ ls
 echo
 cat
 ```
+
 
 
 
