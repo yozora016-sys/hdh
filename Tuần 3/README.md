@@ -39,7 +39,7 @@ cp -a ~/embedded-linux/tinysystem/busybox/_install/* .
 mkdir -p dev proc sys etc tmp lib usr/lib var/log home/root
 ```
 6. Tạo file cấu hình khởi động /etc/inittab.
-Copy nội dung này vào file inittab
+ Copy nội dung này vào file inittab.
 ```bash
 ::sysinit:/etc/init.d/rcS
 ::askfirst:-/bin/sh
@@ -47,15 +47,15 @@ Copy nội dung này vào file inittab
 ::ctrlaltdel:/sbin/reboot
 ::shutdown:/bin/umount -a -r
 ```
-7. Tạo kịch bản khởi động /etc/init.d/rcS
-Tạo file /etc/init.d/rcS và copy nội dung này
+7. Tạo kịch bản khởi động /etc/init.d/rcS.
+ Tạo file /etc/init.d/rcS và copy nội dung này.
 ```bash
 #!/bin/sh
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 /bin/echo "Chuc mung! RootFS da khoi dong thanh cong!"
 ```
-Lưu lại, cấp quyền thực thi
+ Lưu lại, cấp quyền thực thi.
 ```bash
 chmod +x etc/init.d/rcS
 ```
@@ -94,6 +94,7 @@ ls
 echo
 cat
 ```
+
 
 
 
