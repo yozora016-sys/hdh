@@ -30,11 +30,16 @@ Dự án yêu cầu hoàn thành các tiêu chí sau:
 2. Tạo các thư mục hệ thống cơ bản cần thiết (như `/dev`, `/proc`, `/sys`, `/etc`, `/lib`, ...).
 3. Copy toàn bộ nội dung từ thư mục `_install` của BusyBox vào phân vùng RootFS trên thẻ nhớ.
 4. Đảm bảo quyền (permissions) và chủ sở hữu (ownership) đúng chuẩn (`sudo chown -R root:root`).
-
+```bash
+sudo mount /dev/sdb2 /mnt
+sudo cp -a ~/my_rootfs/* /mnt/
+sudo sync
+sudo umount /mnt
+```
 ### Bước 3: Cấu hình `bootargs` để liên kết Kernel
 Trong giao diện dòng lệnh của Bootloader (thường là U-Boot), tiến hành thiết lập biến `bootargs`:
 ```bash
-setenv bootargs 'console=ttyO0,115200n8 root=/dev/mmcblk0p2 rootfstype=ext4 rw'
+setenv bootargs console=ttyO0,115200n8 root=/dev/mmcblk0p2 rootfstype=ext4 rw
 saveenv
 ```
 
@@ -55,4 +60,5 @@ ls
 echo
 cat
 ```
+
 
