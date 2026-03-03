@@ -110,7 +110,10 @@ sudo umount /media/user/rootfs
    # hello
    hello
    ```
+<img width="735" height="493" alt="Screenshot 2026-03-02 110532" src="https://github.com/user-attachments/assets/88795278-d045-4cb8-89ba-976949f8abef" />
+
 **Hoàn thành xuất sắc bài tập System Build & Cross-Compile!**
+
 
 
 
