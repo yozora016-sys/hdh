@@ -22,6 +22,7 @@ Cấu hình như tài liệu tham khảo trang 53, 54. Ngoài ra cần bật th�
 Vào mục **Target packages** để thêm các công cụ quản trị hệ thống vào RootFS:
 - **Text editors and viewers:** Tích chọn `[*] nano` và `[*] vim`.
 <img width="740" height="446" alt="image" src="https://github.com/user-attachments/assets/d1990c55-fa26-4444-acb7-ce1322d83349" />
+
 - **System tools:** Tích chọn `[*] htop`.
 <img width="739" height="441" alt="image" src="https://github.com/user-attachments/assets/cb31ff50-893d-4346-b72b-438af8218294" />
 
@@ -103,4 +104,5 @@ sudo umount /media/user/rootfs
    ```
 
 **Hoàn thành xuất sắc bài tập System Build & Cross-Compile!**
+
 
