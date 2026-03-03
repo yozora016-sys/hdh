@@ -95,14 +95,23 @@ sudo umount /media/user/rootfs
    sudo picocom -b 115200 /dev/ttyUSB0
    ```
 3. Nhấn giữ nút **S2 (BOOT)** trên mạch và cắm nguồn để ép mạch khởi động từ thẻ SD.
-4. Chờ hệ thống nạp Kernel. Khi màn hình hiện `Welcome to Buildroot`, đăng nhập bằng tài khoản `root` (không cần mật khẩu).
-5. **Kiểm tra phần mềm cài thêm:** Gõ lệnh `htop` hoặc `nano` để xác nhận package đã hoạt động.
-6. **Kiểm tra chương trình biên dịch chéo:** Gõ lệnh ứng dụng tại terminal:
+4. Nạp Kernel
+```bash
+=> setenv bootargs console=ttyS0,115200n8 root=/dev/mmcblk0p2 rootwait rw
+=> setenv bootcmd 'load mmc 0:1 0x81000000 zImage; load mmc 0:1 0x82000000 am335x-boneblack-custom.dtb; bootz 0x81000000 - 0x82000000'
+=> saveenv
+=> boot
+
+```
+5. Chờ hệ thống nạp Kernel. Khi màn hình hiện `Welcome to Buildroot`, đăng nhập bằng tài khoản `root` (không cần mật khẩu).
+6. **Kiểm tra phần mềm cài thêm:** Gõ lệnh `htop` hoặc `nano` để xác nhận package đã hoạt động.
+7. **Kiểm tra chương trình biên dịch chéo:** Gõ lệnh ứng dụng tại terminal:
    ```bash
    # hello
    hello
    ```
-
 **Hoàn thành xuất sắc bài tập System Build & Cross-Compile!**
+
+
 
 
