@@ -52,7 +52,7 @@ sudo cp HelloJSON /media/$USER/rootfs/root/
 sudo cp -a ~/embedded-linux/buildroot/buildroot/output/target/usr/lib/libcjson.so* /media/$USER/rootfs/usr/lib/
 ```
 4. Khởi chạy:
-Truy cập BBB qua Pinicom, cấp quyền và chạy:
+Truy cập BBB qua Picocom, cấp quyền và chạy:
 ```Bash
 chmod +x HelloJSON
 ./HelloJSON
@@ -62,48 +62,78 @@ Bài tập 02: Tự tạo thư viện cá nhân
 Mục tiêu: Viết thư viện tính toán cơ bản (file .h và .c), biên dịch tĩnh/động và so sánh.
 
 1. Mã nguồn thư viện mathlib.h và mathlib.c:
-C// mathlib.h
+```bash
+//mathlib.h
 #ifndef MATHLIB_H
 #define MATHLIB_H
 int add_numbers(int a, int b);
 #endif
-
+```
+```bash
 // mathlib.c
 #include "mathlib.h"
-int add_numbers(int a, int b) { return a + b; }
-2. Biên dịch thư viện (.a và .so) và đưa vào Sysroot:Bashexport AR=~/buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-ar
+int add_numbers(int a, int b)
+{
+return a + b;
+}
+```
+2. Biên dịch thư viện (.a và .so) và đưa vào Sysroot:
 
-# Tạo Object file
+```Bash
+export AR=~/buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-ar
+```
+Tạo Object file
+```
 $CC -c -fPIC mathlib.c -o mathlib.o
-
-# Tạo Static Library (.a)
+```
+Tạo Static Library (.a)
+```
 $AR rcs libmathlib.a mathlib.o
-
-# Tạo Dynamic Library (.so)
+```
+Tạo Dynamic Library (.so)
+```
 $CC -shared -o libmathlib.so mathlib.o
-
-# Copy vào Sysroot của Buildroot
-SYSROOT=~/buildroot/output/host/arm-buildroot-linux-gnueabihf/sysroot
-cp mathlib.h $SYSROOT/usr/include/
-cp libmathlib.a libmathlib.so $SYSROOT/usr/lib/
-3. Ứng dụng app.c và quá trình biên dịch:C#include <stdio.h>
+```
+Copy vào Sysroot của Buildroot
+```
+cp mathlib.h embedded-linux/buildroot/buildroot/output/host/arm-linux-gnueabihf/sysroot/usr/include/
+cp libmathlib.a libmathlib.so embedded-linux/buildroot/buildroot/output/host/arm-linux-gnueabihf/sysroot/usr/lib/
+```
+3. Ứng dụng app.c và quá trình biên dịch:
+```
+#include <stdio.h>
 #include "mathlib.h"
 int main() {
     printf("Ket qua: 15 + 25 = %d\n", add_numbers(15, 25));
     return 0;
 }
-Bash# Biên dịch 2 phiên bản
+```
+Biên dịch 2 phiên bản
+```
 $CC app.c -o app_static -lmathlib -static
 $CC app.c -o app_dynamic -lmathlib
-4. Thử nghiệm và So sánh:Bash# Copy file thực thi và thư viện động xuống mạch
+```
+5. Thử nghiệm và So sánh:
+Copy file thực thi vào thẻ nhớ và thư viện động xuống mạch
+```
 sudo cp app_static app_dynamic /media/$USER/rootfs/root/
 sudo cp libmathlib.so /media/$USER/rootfs/usr/lib/
+```
+Cắm vào BBB và chạy thử
+```
+./app_static
+./app_dynamic
+```
 
-# Đánh giá dung lượng (Bản static nặng hơn rất nhiều do chứa sẵn mã nguồn)
+Đánh giá dung lượng (Bản static nặng hơn rất nhiều do chứa sẵn mã nguồn)
+```
 ls -lh app_static app_dynamic
+```
+Phân tích phụ thuộc (Bản dynamic cần libc.so và libmathlib.so)
+```
+~embedded-linux/buildroot/buildroot/output/host/bin/arm-linux-gnueabihf-readelf -d app_dynamic
+```
 
-# Phân tích phụ thuộc (Bản dynamic cần libc.so và libmathlib.so)
-~/buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-readelf -d app_dynamic
 Bài tập 03: Tích hợp ứng dụng, thư viện vào Buildroot Mục tiêu: Đóng gói toàn bộ mã nguồn vào hệ thống package của Buildroot để tự động hóa.1. Khởi tạo Package libmathlib:
 Cấu trúc: package/libmathlib/Config.in và package/libmathlib/libmathlib.mk.Makefile# libmathlib.mk
 LIBMATHLIB_VERSION = 1.0
@@ -145,6 +175,7 @@ define MYAPP_INSTALL_TARGET_CMDS
 endef
 $(eval $(generic-package))
 3. Khai báo và Biên dịch:Sửa file package/Config.in để thêm đường dẫn đến libmathlib/Config.in và myapp/Config.in.Bật ứng dụng trong make menuconfig (các thư viện phụ thuộc sẽ tự động được chọn).Chạy make để Buildroot biên dịch toàn bộ.
+
 
 
 
