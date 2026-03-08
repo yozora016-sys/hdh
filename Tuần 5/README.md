@@ -1,32 +1,28 @@
 # Báo cáo Bài tập Hệ điều hành Nhúng - Biên dịch chéo thư viện và ứng dụng
 
-**Sinh viên thực hiện:** [Điền Họ và Tên của bạn]
-**Mã SV:** [Điền MSSV]
-**Học viện:** Công nghệ Bưu chính Viễn thông (PTIT)
-**Phần cứng đích:** BeagleBone Black (BBB)
-**Công cụ build:** Buildroot
-
----
 
 ## 📖 Tổng quan dự án
-[cite_start]Dự án này giải quyết 03 bài toán cốt lõi trong phát triển Linux nhúng[cite: 1]:
-1. [cite_start]Sử dụng thư viện có sẵn (cJSON) bằng Toolchain của Buildroot[cite: 2, 3].
-2. [cite_start]Tự thiết kế thư viện tĩnh/động (Static/Dynamic Library) và quản lý Sysroot[cite: 9, 10].
-3. [cite_start]Đóng gói ứng dụng và thư viện thành một Package chuẩn, tích hợp sâu vào quy trình tự động của Buildroot[cite: 18, 19, 20].
+Dự án này giải quyết 03 bài toán cốt lõi trong phát triển Linux nhún:
+1. Sử dụng thư viện có sẵn (cJSON) bằng Toolchain của Buildroot.
+2. Tự thiết kế thư viện tĩnh/động (Static/Dynamic Library) và quản lý Sysroot.
+3. Đóng gói ứng dụng và thư viện thành một Package chuẩn, tích hợp sâu vào quy trình tự động của Buildroot.
 
 ---
 
 ## 🚀 Hướng dẫn thực hiện chi tiết
 
-### [cite_start]Bài tập 01: Biên dịch ứng dụng với thư viện đã có [cite: 2]
-[cite_start]**Mục tiêu:** Viết chương trình C/C++ parse gói tin JSON và in lên Terminal[cite: 3, 5].
+### Bài tập 01: Biên dịch ứng dụng với thư viện đã có 
+**Mục tiêu:** Viết chương trình C/C++ parse gói tin JSON và in lên Terminal.
 
-**1. [cite_start]Bật cJSON trong Buildroot[cite: 4]:**
+**1.Bật cJSON trong Buildroot[cite: 4]:**
 ```bash
 make menuconfig
 # Đường dẫn: Target packages -> Libraries -> JSON/XML -> Chọn [*] cJSON
 make
-2. Mã nguồn HelloJSON.c:C#include <stdio.h>
+```
+2. Mã nguồn HelloJSON.c:
+```bash
+#include <stdio.h>
 #include <cjson/cJSON.h>
 
 int main() {
@@ -40,6 +36,7 @@ int main() {
     }
     return 0;
 }
+```
 3. Biên dịch chéo và nạp xuống mạch:Bash# Trỏ Toolchain
 export CC=~/buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-gcc
 
@@ -135,3 +132,4 @@ define MYAPP_INSTALL_TARGET_CMDS
 endef
 $(eval $(generic-package))
 3. Khai báo và Biên dịch:Sửa file package/Config.in để thêm đường dẫn đến libmathlib/Config.in và myapp/Config.in.Bật ứng dụng trong make menuconfig (các thư viện phụ thuộc sẽ tự động được chọn).Chạy make để Buildroot biên dịch toàn bộ.
+
