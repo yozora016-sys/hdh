@@ -14,7 +14,7 @@ Dự án này giải quyết 03 bài toán cốt lõi trong phát triển Linux 
 ### Bài tập 01: Biên dịch ứng dụng với thư viện đã có 
 **Mục tiêu:** Viết chương trình C/C++ parse gói tin JSON và in lên Terminal.
 
-**1.Bật cJSON trong Buildroot[cite: 4]:**
+**1.Bật cJSON trong Buildroot:**
 ```bash
 make menuconfig
 # Đường dẫn: Target packages -> Libraries -> JSON/XML -> Chọn [*] cJSON
@@ -38,15 +38,15 @@ int main() {
 }
 ```
 3. Biên dịch chéo và nạp xuống mạch:
-# Trỏ Toolchain
+Trỏ Toolchain
 ```bash
 export CC=~/embedded-linux/buildroot/buildroot/output/host/bin/arm-linux-gcc
 ```
-# Biên dịch liên kết với cJSON
+Biên dịch liên kết với cJSON
 ```bash
 $CC HelloJSON.c -o HelloJSON -lcjson
 ```
-# Copy vào thẻ nhớ (Cần copy cả thư viện động của cJSON xuống BBB)
+Copy vào thẻ nhớ (Cần copy cả thư viện động của cJSON xuống BBB)
 ```bash
 sudo cp HelloJSON /media/$USER/rootfs/root/
 sudo cp -a ~/embedded-linux/buildroot/buildroot/output/target/usr/lib/libcjson.so* /media/$USER/rootfs/usr/lib/
@@ -137,5 +137,6 @@ define MYAPP_INSTALL_TARGET_CMDS
 endef
 $(eval $(generic-package))
 3. Khai báo và Biên dịch:Sửa file package/Config.in để thêm đường dẫn đến libmathlib/Config.in và myapp/Config.in.Bật ứng dụng trong make menuconfig (các thư viện phụ thuộc sẽ tự động được chọn).Chạy make để Buildroot biên dịch toàn bộ.
+
 
 
