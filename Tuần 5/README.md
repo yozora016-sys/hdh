@@ -37,17 +37,22 @@ int main() {
     return 0;
 }
 ```
-3. Biên dịch chéo và nạp xuống mạch:Bash# Trỏ Toolchain
-export CC=~/buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-gcc
-
+3. Biên dịch chéo và nạp xuống mạch:
+# Trỏ Toolchain
+```bash
+export CC=~/embedded-linux/buildroot/buildroot/output/host/bin/arm-linux-gcc
+```
 # Biên dịch liên kết với cJSON
+```bash
 $CC HelloJSON.c -o HelloJSON -lcjson
-
+```
 # Copy vào thẻ nhớ (Cần copy cả thư viện động của cJSON xuống BBB)
+```bash
 sudo cp HelloJSON /media/$USER/rootfs/root/
-sudo cp -a ~/buildroot/output/target/usr/lib/libcjson.so* /media/$USER/rootfs/usr/lib/
+sudo cp -a ~/embedded-linux/buildroot/buildroot/output/target/usr/lib/libcjson.so* /media/$USER/rootfs/usr/lib/
+```
 4. Khởi chạy:
-Truy cập BBB qua Minicom, cấp quyền và chạy:Bashchmod +x HelloJSON
+Truy cập BBB qua Pinicom, cấp quyền và chạy:Bashchmod +x HelloJSON
 ./HelloJSON
 Bài tập 02: Tự tạo thư viện cá nhân Mục tiêu: Viết thư viện tính toán cơ bản (file .h và .c), biên dịch tĩnh/động và so sánh.1. Mã nguồn thư viện mathlib.h và mathlib.c:C// mathlib.h
 #ifndef MATHLIB_H
@@ -132,4 +137,5 @@ define MYAPP_INSTALL_TARGET_CMDS
 endef
 $(eval $(generic-package))
 3. Khai báo và Biên dịch:Sửa file package/Config.in để thêm đường dẫn đến libmathlib/Config.in và myapp/Config.in.Bật ứng dụng trong make menuconfig (các thư viện phụ thuộc sẽ tự động được chọn).Chạy make để Buildroot biên dịch toàn bộ.
+
 
