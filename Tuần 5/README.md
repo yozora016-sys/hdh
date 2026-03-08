@@ -1,7 +1,7 @@
 # Báo cáo Bài tập Hệ điều hành Nhúng - Biên dịch chéo thư viện và ứng dụng
 
 
-## 📖 Tổng quan dự án
+## Tổng quan dự án
 Dự án này giải quyết 03 bài toán cốt lõi trong phát triển Linux nhún:
 1. Sử dụng thư viện có sẵn (cJSON) bằng Toolchain của Buildroot.
 2. Tự thiết kế thư viện tĩnh/động (Static/Dynamic Library) và quản lý Sysroot.
@@ -9,7 +9,7 @@ Dự án này giải quyết 03 bài toán cốt lõi trong phát triển Linux 
 
 ---
 
-## 🚀 Hướng dẫn thực hiện chi tiết
+## Hướng dẫn thực hiện chi tiết
 
 ### Bài tập 01: Biên dịch ứng dụng với thư viện đã có 
 **Mục tiêu:** Viết chương trình C/C++ parse gói tin JSON và in lên Terminal.
@@ -284,10 +284,12 @@ sudo umount /media/$USER/rootfs
 ```
 
 Gõ lệnh myapp
+
 <img width="280" height="109" alt="image" src="https://github.com/user-attachments/assets/21cbcf74-a09f-42a6-b074-3e1a3d0f2715" />
 
 -----------------
 Mở picocom: sudo picocom -b 115200 /dev/ttyUSB0
+
 
 
 
