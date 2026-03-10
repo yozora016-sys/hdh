@@ -120,6 +120,10 @@ Copy file thực thi vào thẻ nhớ và thư viện động xuống mạch
 ```
 sudo cp app_static app_dynamic /media/$USER/rootfs/root/
 sudo cp libmathlib.so /media/$USER/rootfs/usr/lib/
+sync
+sudo umount /media/$USER/rootfs
+sudo umount /media/$USER/boot
+
 ```
 Cắm vào BBB và chạy thử
 ```
@@ -289,6 +293,7 @@ Gõ lệnh myapp
 
 -----------------
 Mở picocom: sudo picocom -b 115200 /dev/ttyUSB0
+
 
 
 
