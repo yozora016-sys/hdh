@@ -138,12 +138,12 @@ ls -lh app_static app_dynamic
 
 Phân tích phụ thuộc (Bản dynamic cần libc.so và libmathlib.so)
 ```
-~embedded-linux/buildroot/buildroot/output/host/bin/arm-linux-readelf -d app_dynamic
+~/embedded-linux/buildroot/buildroot/output/host/bin/arm-linux-readelf -d app_dynamic
 ```
 <img width="878" height="578" alt="image" src="https://github.com/user-attachments/assets/9387d05f-d655-4a37-aa61-39b20dc667c4" />
 
 ```
-~embedded-linux/buildroot/buildroot/output/host/bin/arm-linux-readelf -d app_static
+~/embedded-linux/buildroot/buildroot/output/host/bin/arm-linux-readelf -d app_static
 ```
 <img width="883" height="99" alt="image" src="https://github.com/user-attachments/assets/12b821e9-782a-4ca9-abf0-2855de8bc19c" />
 
@@ -289,6 +289,7 @@ Gõ lệnh myapp
 
 -----------------
 Mở picocom: sudo picocom -b 115200 /dev/ttyUSB0
+
 
 
 
