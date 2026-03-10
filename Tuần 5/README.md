@@ -82,7 +82,7 @@ return a + b;
 2. Biên dịch thư viện (.a và .so) và đưa vào Sysroot:
 
 ```Bash
-export AR=~/buildroot/output/host/bin/arm-buildroot-linux-gnueabihf-ar
+export AR=~/buildroot/output/host/bin/arm-buildroot-linux-ar
 ```
 Tạo Object file
 ```
@@ -289,6 +289,7 @@ Gõ lệnh myapp
 
 -----------------
 Mở picocom: sudo picocom -b 115200 /dev/ttyUSB0
+
 
 
 
