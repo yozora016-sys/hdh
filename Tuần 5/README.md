@@ -54,7 +54,6 @@ sudo cp -a ~/embedded-linux/buildroot/buildroot/output/target/usr/lib/libcjson.s
 4. Khởi chạy:
 Truy cập BBB qua Picocom, cấp quyền và chạy:
 ```Bash
-chmod +x HelloJSON
 ./HelloJSON
 ```
 <img width="439" height="100" alt="Screenshot 2026-03-08 194321" src="https://github.com/user-attachments/assets/aa7f3ea8-a0fe-4b16-93b9-0800aecefbc7" />
@@ -296,6 +295,7 @@ Mở picocom: sudo picocom -b 115200 /dev/ttyUSB0
 
 
 Clone buildroot: git clone https://gitlab.com/buildroot.org/buildroot.git
+
 
 
 
