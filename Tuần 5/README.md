@@ -293,7 +293,10 @@ Gõ lệnh myapp
 
 -----------------
 Mở picocom: sudo picocom -b 115200 /dev/ttyUSB0
+
+
 Clone buildroot: git clone https://gitlab.com/buildroot.org/buildroot.git
+
 
 
 
