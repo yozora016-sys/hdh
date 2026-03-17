@@ -1,0 +1,4 @@
+config BR2_PACKAGE_BLINK_APP
+	bool "blink_app"
+	help
+      		Blink LED application.

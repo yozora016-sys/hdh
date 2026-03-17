@@ -1,0 +1,6 @@
+config BR2_PACKAGE_GPIO_DRIVER
+	bool "gpio_driver"
+	depends on BR2_LINUX_KERNEL
+	help
+      		Custom GPIO 60 Driver for BeagleBone Black.
+
