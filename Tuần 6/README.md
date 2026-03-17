@@ -1,7 +1,7 @@
 # BeagleBone Black - Custom LED Blink Project (Buildroot)
 
 
-## 🗂 Cấu trúc thư mục dự án (trong Buildroot)
+## Cấu trúc thư mục dự án (trong Buildroot)
 Dự án được tích hợp trực tiếp vào cây thư mục của Buildroot:
 ```text
 buildroot/
