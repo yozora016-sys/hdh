@@ -1,8 +1,6 @@
 # BeagleBone Black: Điều khiển LED qua Sysfs & Tích hợp Buildroot Package
 
-## 📁 Cấu trúc dự án
-
-Dự án được chia làm 2 phần rõ rệt: Mã nguồn ứng dụng và Kịch bản đóng gói của Buildroot.
+## Cấu trúc dự án
 
 ```text
 ~/embedded-linux/buildroot/
@@ -160,5 +158,19 @@ Bước 5: Chạy thử
 
 
 Giải nén và nạp lại rootfs.tar
+
 <img width="449" height="317" alt="image" src="https://github.com/user-attachments/assets/4c888182-b2f0-42d7-97bb-5f957bdd1f2c" />
 
+---------------------------------------
+Mở picocom: 
+```bash 
+sudo picocom -b 115200 /dev/ttyUSB0
+```
+
+Giải nén và nạp lại file rootfs.tar vào thẻ SD
+```
+sudo rm -rf /media/$USER/rootfs/*
+sudo tar -xf output/images/rootfs.tar -C /media/$USER/rootfs/
+sync
+sudo umount /media/$USER/rootfs
+```
