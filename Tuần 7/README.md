@@ -186,7 +186,9 @@ echo "1" > /dev/basic_device
 cat /dev/basic_device
 ```
 <img width="460" height="118" alt="image" src="https://github.com/user-attachments/assets/9aa0defc-8889-44f4-86c8-dd133107d358" />
-<img width="460" height="118" alt="image" src="https://github.com/user-attachments/assets/f1823f61-d28b-458d-b46d-24f5a0b47461" />
+
+<img width="594" height="96" alt="image" src="https://github.com/user-attachments/assets/657e28d3-d1c5-4aa1-ba73-14380dbdd4de" />
+
 
 
 ```
