@@ -45,29 +45,6 @@ static ssize_t basic_driver_read(struct file *file, char __user *buf, size_t cou
 static ssize_t basic_driver_write(struct file *file, const char __user *buf, size_t count, loff_t *offset) {}
 ```
 
-### Cấp phát Major/Minor Động
-
-Thay vì hard-code một số cố định, driver sử dụng cơ chế **cấp phát động** để tránh xung đột với các thiết bị khác trên hệ thống:
-
-```c
-int result = alloc_chrdev_region(&dev_num, 0, 1, "basic_driver");
-if (result < 0) {
-    printk(KERN_ERR "Failed to allocate character device region\n");
-    return result;
-}
-```
-
-| Tham số | Mô tả |
-|---------|-------|
-| `&dev_num` | Con trỏ lưu kết quả `dev_t` (gồm cả Major + Minor) |
-| `0` | Minor number bắt đầu |
-| `1` | Số lượng minor number cần cấp phát |
-| `"basic_driver"` | Tên hiển thị trong `/proc/devices` |
-
-Sau khi cấp phát, dùng `MAJOR(dev_num)` và `MINOR(dev_num)` để in thông tin.
-```
-printk(KERN_INFO "Registered character device with major number %d and minor number %d\n", MAJOR(dev_num), MINOR(dev_num));
-```
 
 C. Đăng ký qua struct file_operations
 
