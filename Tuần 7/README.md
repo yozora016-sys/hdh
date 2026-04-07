@@ -174,4 +174,189 @@ sudo rmmod basic_driver
 ```
 <img width="454" height="105" alt="Screenshot 2026-03-31 210503" src="https://github.com/user-attachments/assets/17f53e1b-53ec-4cef-a3df-022d1eba3759" />
 
+## Yêu cầu 5
+
+Mã nguồn device driver tích hợp ioremap
+```
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/fs.h>
+#include <linux/cdev.h>
+#include <linux/uaccess.h>
+#include <linux/device.h>
+#include <linux/io.h>
+#include <linux/version.h>
+
+#define DRIVER_NAME "basic_driver"
+#define CLASS_NAME  "basic_class"
+#define DEVICE_NAME "basic_device"
+
+/* --- Địa chỉ thanh ghi AM335x --- */
+#define CONTROL_MODULE_BASE 0x44E10000
+#define MUX_USR3_LED        0x860      // Offset của conf_gpmc_a8 (USR3)
+#define GPIO1_BASE          0x4804C000
+#define GPIO1_SIZE          0x1000
+
+#define GPIO_OE             0x134   
+#define GPIO_DATAIN         0x138   
+#define GPIO_CLEARDATAOUT   0x190   
+#define GPIO_SETDATAOUT     0x194   
+#define LED_USR3            (1 << 24) 
+
+static dev_t dev_num;
+static struct cdev basic_cdev;
+static struct class *basic_class;
+static struct device *basic_device;
+static void __iomem *gpio1_addr; 
+static void __iomem *control_module_addr;
+
+static int basic_driver_open(struct inode *inode, struct file *file) { return 0; }
+static int basic_driver_release(struct inode *inode, struct file *file) { return 0; }
+
+static ssize_t basic_driver_read(struct file *file, char __user *buf, size_t count, loff_t *offset) {
+    uint32_t reg_val;
+    char status;
+    if (*offset > 0) return 0;
+    reg_val = ioread32(gpio1_addr + GPIO_DATAIN);
+    status = (reg_val & LED_USR3) ? '1' : '0';
+    if (copy_to_user(buf, &status, 1)) return -EFAULT;
+    *offset += 1;
+    return 1;
+}
+
+static ssize_t basic_driver_write(struct file *file, const char __user *buf, size_t count, loff_t *offset) {
+    char input;
+    if (copy_from_user(&input, buf, 1)) return -EFAULT;
+    if (input == '1') {
+        iowrite32(LED_USR3, gpio1_addr + GPIO_SETDATAOUT);
+        pr_info("%s: LED ON\n", DRIVER_NAME);
+    } else if (input == '0') {
+        iowrite32(LED_USR3, gpio1_addr + GPIO_CLEARDATAOUT);
+        pr_info("%s: LED OFF\n", DRIVER_NAME);
+    }
+    return count;
+}
+
+static const struct file_operations basic_driver_fops = {
+    .owner = THIS_MODULE,
+    .open = basic_driver_open,
+    .release = basic_driver_release,
+    .read = basic_driver_read,
+    .write = basic_driver_write,
+};
+
+static int __init basic_driver_init(void) {
+    uint32_t reg_val;
+
+    if (alloc_chrdev_region(&dev_num, 0, 1, DRIVER_NAME) < 0) return -1;
+    cdev_init(&basic_cdev, &basic_driver_fops);
+    cdev_add(&basic_cdev, dev_num, 1);
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+    basic_class = class_create(CLASS_NAME);
+#else
+    basic_class = class_create(THIS_MODULE, CLASS_NAME);
+#endif
+    basic_device = device_create(basic_class, NULL, dev_num, NULL, DEVICE_NAME);
+
+    /* --- BƯỚC QUAN TRỌNG: ÉP PIN MUX --- */
+    control_module_addr = ioremap(CONTROL_MODULE_BASE, 0x1000);
+    if (control_module_addr) {
+        // Ghi giá trị 0x07: Mode 7 (GPIO), Pull-up/down disabled
+        iowrite32(0x07, control_module_addr + MUX_USR3_LED);
+        iounmap(control_module_addr);
+        pr_info("%s: Forced USR3 Pin Mux to GPIO Mode 7\n", DRIVER_NAME);
+    }
+
+    /* --- Ánh xạ GPIO1 --- */
+    gpio1_addr = ioremap(GPIO1_BASE, GPIO1_SIZE);
+    
+    // Cấu hình Output
+    reg_val = ioread32(gpio1_addr + GPIO_OE);
+    reg_val &= ~LED_USR3; 
+    iowrite32(reg_val, gpio1_addr + GPIO_OE);
+
+    // Ép tắt ngay lập tức
+    iowrite32(LED_USR3, gpio1_addr + GPIO_CLEARDATAOUT);
+
+    pr_info("%s: Driver loaded and LED forced OFF\n", DRIVER_NAME);
+    return 0;
+}
+
+static void __exit basic_driver_exit(void) {
+    iowrite32(LED_USR3, gpio1_addr + GPIO_CLEARDATAOUT);
+    iounmap(gpio1_addr);
+    device_destroy(basic_class, dev_num);
+    class_destroy(basic_class);
+    cdev_del(&basic_cdev);
+    unregister_chrdev_region(dev_num, 1);
+    pr_info("%s: Driver unloaded\n", DRIVER_NAME);
+}
+
+module_init(basic_driver_init);
+module_exit(basic_driver_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Yozora");
+```
+Chạy lại lệnh make để tạo ra file .ko mới
+
+## Yêu cầu 6
+
+Mã nguồn ứng dụng
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+
+#define DEVICE_PATH "/dev/basic_device"
+
+int main(int argc, char *argv[]) {
+    int fd;
+    int blink_count = 10;
+    int delay_ms = 500;
+    if (argc == 2) {
+        delay_ms = atoi(argv[1]);
+    }
+
+    fd = open(DEVICE_PATH, O_RDWR);
+    if (fd < 0) {
+        perror("Failed to open device file");
+        return -1;
+    }
+
+    printf("Starting LED Blink on USR3 with delay %dms...\n", delay_ms);
+
+    for (int i = 0; i < blink_count; i++) {
+        write(fd, "1", 1);
+        printf("LED ON\n");
+        usleep(delay_ms * 1000);
+
+        write(fd, "0", 1);
+        printf("LED OFF\n");
+        usleep(delay_ms * 1000);
+    }
+    close(fd);
+    printf("Blink finished.\n");
+    return 0;
+}
+```
+
+Dùng trình biên dịch arm-linux-gcc để build.
+
+Nạp file vừa build được và flie .ko ở trên vào thẻ nhớ.
+
+Kết nối BBB với terminal rồi nạp device driver mới.
+```
+insmod basic_driver.ko
+```
+
+Chạy chương trình.
+```
+./blink_app 500
+```
+
 
