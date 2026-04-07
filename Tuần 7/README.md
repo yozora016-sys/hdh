@@ -177,7 +177,7 @@ sudo rmmod basic_driver
 ## Yêu cầu 5
 
 Mã nguồn device driver tích hợp ioremap
-```
+```c
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
@@ -192,9 +192,8 @@ Mã nguồn device driver tích hợp ioremap
 #define CLASS_NAME  "basic_class"
 #define DEVICE_NAME "basic_device"
 
-/* --- Địa chỉ thanh ghi AM335x --- */
 #define CONTROL_MODULE_BASE 0x44E10000
-#define MUX_USR3_LED        0x860      // Offset của conf_gpmc_a8 (USR3)
+#define MUX_USR3_LED        0x860      
 #define GPIO1_BASE          0x4804C000
 #define GPIO1_SIZE          0x1000
 
@@ -260,24 +259,18 @@ static int __init basic_driver_init(void) {
 #endif
     basic_device = device_create(basic_class, NULL, dev_num, NULL, DEVICE_NAME);
 
-    /* --- BƯỚC QUAN TRỌNG: ÉP PIN MUX --- */
     control_module_addr = ioremap(CONTROL_MODULE_BASE, 0x1000);
     if (control_module_addr) {
-        // Ghi giá trị 0x07: Mode 7 (GPIO), Pull-up/down disabled
         iowrite32(0x07, control_module_addr + MUX_USR3_LED);
         iounmap(control_module_addr);
         pr_info("%s: Forced USR3 Pin Mux to GPIO Mode 7\n", DRIVER_NAME);
     }
-
-    /* --- Ánh xạ GPIO1 --- */
     gpio1_addr = ioremap(GPIO1_BASE, GPIO1_SIZE);
     
-    // Cấu hình Output
     reg_val = ioread32(gpio1_addr + GPIO_OE);
     reg_val &= ~LED_USR3; 
     iowrite32(reg_val, gpio1_addr + GPIO_OE);
 
-    // Ép tắt ngay lập tức
     iowrite32(LED_USR3, gpio1_addr + GPIO_CLEARDATAOUT);
 
     pr_info("%s: Driver loaded and LED forced OFF\n", DRIVER_NAME);
@@ -305,7 +298,7 @@ Chạy lại lệnh make để tạo ra file .ko mới
 ## Yêu cầu 6
 
 Mã nguồn ứng dụng
-```
+```c
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
