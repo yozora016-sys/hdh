@@ -1,8 +1,8 @@
-*1. Bài tập 2.1: Cài đặt GDB
+#1. Bài tập 2.1: Cài đặt GDB
 ```
 make menuconfig -> Target packages -> Debugging, profiling... -> gdb -> full debugger/gdbserver
 ```
-*2. Bài tập 2.2: Sử dụng GDB điều khiển luồng chương trình
+#2. Bài tập 2.2: Sử dụng GDB điều khiển luồng chương trình
 ```
 gdb ./main_app
 ```
