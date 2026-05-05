@@ -31,6 +31,7 @@ Trong môi trường GDB, các thao tác sau đã được thực thi:
 valgrind --leak-check=full ./leak_app
 ```
 Phân tích kết quả:
+
   -Báo cáo HEAP SUMMARY của Valgrind chỉ ra rõ ràng:
 
     +in use at exit: 400 bytes in 1 blocks: Khi chương trình kết thúc, vẫn còn 400 bytes đang bị chiếm dụng.
