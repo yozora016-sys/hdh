@@ -1,8 +1,8 @@
-#1. Bài tập 2.1: Cài đặt GDB
+##1. Bài tập 2.1: Cài đặt GDB
 ```
 make menuconfig -> Target packages -> Debugging, profiling... -> gdb -> full debugger/gdbserver
 ```
-#2. Bài tập 2.2: Sử dụng GDB điều khiển luồng chương trình
+2. Bài tập 2.2: Sử dụng GDB điều khiển luồng chương trình
 ```
 gdb ./main_app
 ```
@@ -24,7 +24,7 @@ Kiểm tra thanh ghi: Lệnh info registers xuất ra toàn bộ trạng thái c
 
 <img width="883" height="656" alt="image" src="https://github.com/user-attachments/assets/519ca222-6fed-4f9f-bfb6-92d3df722c26" />
 
-*3. Bài tập 2.3: Phân tích rò rỉ bộ nhớ (Memory Leak) với Valgrind
+3. Bài tập 2.3: Phân tích rò rỉ bộ nhớ (Memory Leak) với Valgrind
 
 ```
 valgrind --leak-check=full ./leak_app
@@ -40,7 +40,7 @@ Truy vết (Traceback): Valgrind định vị chính xác lỗi xảy ra tại q
 
 <img width="863" height="438" alt="image" src="https://github.com/user-attachments/assets/579c73d7-f6cd-445b-bda0-f23e6a4a8bf8" />
 
-*4. Bài tập 2.4: Phân tích Core Dump
+4. Bài tập 2.4: Phân tích Core Dump
 
 ```
 ulimit -c unlimited
@@ -62,7 +62,7 @@ Truy vết tự động: GDB tự động trỏ ngay đến hàm cause_crash () 
 
 <img width="879" height="278" alt="image" src="https://github.com/user-attachments/assets/585559cc-f25c-4b5c-96c5-8fa425b53283" />
 
-*5. Bài tập 2.5: Phân tích hiệu năng với Perf
+5. Bài tập 2.5: Phân tích hiệu năng với Perf
 ```
 perf record ./main_app
 ```
@@ -79,7 +79,7 @@ Dữ liệu trong perf.data lúc này có thể được đọc bằng lệnh pe
 
 <img width="879" height="278" alt="image" src="https://github.com/user-attachments/assets/585559cc-f25c-4b5c-96c5-8fa425b53283" />
 
-*6. Bài tập 2.6: Phân tích lời gọi hệ thống Strace
+6. Bài tập 2.6: Phân tích lời gọi hệ thống Strace
 ```
 strace ./main_app
 ```
