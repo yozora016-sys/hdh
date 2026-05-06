@@ -8,7 +8,7 @@ gdb ./main_app
 ```
 Trong môi trường GDB, các thao tác sau đã được thực thi:
 
-  -Đặt Breakpoint: b 20 (lỗi do file chưa chuẩn) và chuyển sang b main (đặt điểm dừng thành công tại dòng 13 của hàm main).
+  -Đặt Breakpoint:b main (đặt điểm dừng thành công tại dòng 13 của hàm main).
 
   -Điều khiển luồng: Sử dụng lệnh r (run) để chạy đến điểm dừng. Tiếp tục dùng n (next) để chạy từng dòng không nhảy vào hàm con, và s (step) để nhảy sâu vào bên trong các khối lệnh.
 
