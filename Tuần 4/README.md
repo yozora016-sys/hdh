@@ -81,8 +81,8 @@ sudo cp ~/hello /media/user/rootfs/usr/bin/
 **4. Đồng bộ và tháo thẻ an toàn:**
 ```bash
 sync
-sudo umount /media/user/boot
-sudo umount /media/user/rootfs
+sudo umount /media/$USER/boot
+sudo umount /media/$USER/rootfs
 ```
 
 ---
