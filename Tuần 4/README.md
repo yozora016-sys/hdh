@@ -65,12 +65,12 @@ Kiểm tra lại bằng lệnh `file hello`, kết quả trả về `ELF 32-bit 
 **1. Copy file khởi động và Kernel vào phân vùng Boot:**
 ```bash
 cd ~/embedded-linux/buildroot/buildroot/output/images/
-cp MLO u-boot.img zImage am335x-boneblack-custom.dtb /media/user/boot/
+cp zImage am335x-boneblack-custom.dtb /media/$USER/boot/
 ```
 
 **2. Giải nén Root Filesystem vào phân vùng Rootfs:**
 ```bash
-sudo tar xpf rootfs.tar -C /media/user/rootfs
+sudo tar xpf rootfs.tar -C /media/$USER/rootfs
 ```
 
 **3. Đưa chương trình C vào RootFS:**
@@ -114,7 +114,8 @@ sudo umount /media/$USER/rootfs
 
 ------------------------------------
 
-
+sudo rm -rf /media/$USER/rootfs/*
+sudo rm -rf /media/$USER/boot/am335x-boneblack-custom.dtb /media/$USER/boot/zImage
 
 
 
