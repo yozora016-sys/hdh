@@ -1,0 +1,5 @@
+config BR2_PACKAGE_ENVMON
+    bool "envmon"
+    help
+      led btn dht11 oled i2c
+      

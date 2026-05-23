@@ -1,0 +1,80 @@
+#!/bin/sh
+
+KVER=$(uname -r)
+MOD_SRC="/lib/modules"                  
+MOD_DST="/lib/modules/${KVER}/envmon"   
+
+case "$1" in
+    start)
+        echo "Loading EnvMon drivers..."
+
+        mkdir -p ${MOD_DST}
+        cp ${MOD_SRC}/gpio_btnled.ko ${MOD_DST}/ 2>/dev/null
+        cp ${MOD_SRC}/oled_drv.ko    ${MOD_DST}/ 2>/dev/null
+
+        depmod -a
+
+        modprobe gpio_btnled btn_gpio=540 led_gpio=530 \
+            || insmod ${MOD_DST}/gpio_btnled.ko btn_gpio=540 led_gpio=530
+
+        modprobe oled_drv \
+            || insmod ${MOD_DST}/oled_drv.ko
+
+
+        sleep 2
+
+
+        echo "Checking devices..."
+        [ -c /dev/btnled ] && echo "  [OK] /dev/btnled" \
+                           || echo "  [FAIL] /dev/btnled not found"
+        [ -c /dev/oled0  ] && echo "  [OK] /dev/oled0"  \
+                           || echo "  [FAIL] /dev/oled0 not found"
+
+        echo "Starting EnvMon application..."
+        /usr/bin/envmon &
+        echo $! > /var/run/envmon.pid
+        echo "EnvMon started (PID=$(cat /var/run/envmon.pid))"
+        ;;
+
+    stop)
+        echo "Stopping EnvMon..."
+        if [ -f /var/run/envmon.pid ]; then
+            kill $(cat /var/run/envmon.pid) 2>/dev/null
+            rm -f /var/run/envmon.pid
+        fi
+
+        sleep 2
+
+        rmmod oled_drv    2>/dev/null && echo "  oled_drv removed"
+        rmmod gpio_btnled 2>/dev/null && echo "  gpio_btnled removed"
+
+        
+        echo "EnvMon stopped."
+        ;;
+
+    restart)
+        $0 stop
+        sleep 2
+        $0 start
+        ;;
+
+    status)
+        echo "=== Module status ==="
+        lsmod | grep -E "gpio_btnled|oled" || echo "No envmon modules loaded"
+        
+        echo "=== Device nodes ==="
+        ls -la /dev/btnled /dev/oled0 2>/dev/null || echo "No device nodes"
+        
+        echo "=== Process ==="
+        [ -f /var/run/envmon.pid ] \
+            && echo "envmon PID=$(cat /var/run/envmon.pid)" \
+            || echo "envmon not running"
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+        ;;
+esac
+
+exit 0
