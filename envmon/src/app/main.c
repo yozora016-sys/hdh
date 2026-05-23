@@ -7,11 +7,10 @@
 #include <signal.h>
 #include <time.h>
 #include <pthread.h>
-#include <poll.h>     
+#include <poll.h>      
 
 #define DEV_BTNLED  "/dev/btnled"
 #define DEV_OLED    "/dev/oled0"
-
 
 typedef struct {
     int   system_on;
@@ -20,14 +19,20 @@ typedef struct {
 } shared_state_t;
 
 static shared_state_t   g_state;
-static pthread_mutex_t  state_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t   toggle_cond = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t  state_mutex    = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t   toggle_cond    = PTHREAD_COND_INITIALIZER;
+static pthread_cond_t   system_on_cond = PTHREAD_COND_INITIALIZER; 
 
 static volatile sig_atomic_t running = 1;
-
-
 static int wakeup_pipe[2];
 
+static void sig_handler(int sig)
+{
+    (void)sig;
+    running = 0;
+    const char c = 'x';
+    write(wakeup_pipe[1], &c, 1);
+}
 
 static long long read_sysfs_ll(const char *path, int *ok)
 {
@@ -67,16 +72,6 @@ static int find_iio_dht11(char *temp_path, char *humi_path)
     }
     return -1;
 }
-
-static void sig_handler(int sig)
-{
-    (void)sig;
-    running = 0;
-
-    const char c = 'x';
-    write(wakeup_pipe[1], &c, 1);
-}
-
 
 static void *thread_button(void *arg)
 {
@@ -123,10 +118,17 @@ static void *thread_button(void *arg)
             int state = atoi(buf);
             if (state == 1 && last_state == 0) {
                 pthread_mutex_lock(&state_mutex);
+                
                 g_state.system_on = !g_state.system_on;
-                printf("[BUTTON] pressed → System %s\n",
-                       g_state.system_on ? "ON" : "OFF");
-                pthread_cond_signal(&toggle_cond);
+                int new_state = g_state.system_on;
+                printf("[BUTTON] pressed → System %s\n", new_state ? "ON" : "OFF");
+
+                if (new_state) {
+                    pthread_cond_broadcast(&system_on_cond);
+                } else {
+                    pthread_cond_signal(&toggle_cond);
+                }
+
                 pthread_mutex_unlock(&state_mutex);
             }
             last_state = state;
@@ -151,39 +153,42 @@ static void *thread_sensor(void *arg)
     iio_num = find_iio_dht11(temp_path, humi_path);
     if (iio_num < 0) {
         printf("[SENSOR] ERROR: DHT11 IIO not found\n");
-
     } else {
         printf("[SENSOR] DHT11 at iio:device%d\n", iio_num);
     }
 
     while (running) {
+  
         pthread_mutex_lock(&state_mutex);
-        int sys_on = g_state.system_on;
+        
+        while (!g_state.system_on && running) {
+            pthread_cond_wait(&system_on_cond, &state_mutex);
+        }
+        
         pthread_mutex_unlock(&state_mutex);
 
-        if (!sys_on || iio_num < 0) { 
-            sleep(1); 
-            continue; 
-        }
+        if (!running) break;
 
-        int temp_ok = 0, humi_ok = 0;
-        long long temp_raw = read_sysfs_ll(temp_path, &temp_ok);
-        long long humi_raw = 0;
-        
-        if (temp_ok) {
-            humi_raw = read_sysfs_ll(humi_path, &humi_ok);
-        }
-
-        if (temp_ok && humi_ok) {
-            float temp = temp_raw / 1000.0f;
-            float humi = humi_raw / 1000.0f;
+        if (iio_num >= 0) {
+            int temp_ok = 0, humi_ok = 0;
+            long long temp_raw = read_sysfs_ll(temp_path, &temp_ok);
+            long long humi_raw = 0;
             
-            if (temp >= -10 && temp <= 60 && humi >= 0 && humi <= 100) {
-                pthread_mutex_lock(&state_mutex);
-                g_state.last_temp = temp;
-                g_state.last_humi = humi;
-                pthread_mutex_unlock(&state_mutex);
-                printf("[SENSOR] OK %.1f°C %.1f%%\n", temp, humi);
+            if (temp_ok) {
+                humi_raw = read_sysfs_ll(humi_path, &humi_ok);
+            }
+
+            if (temp_ok && humi_ok) {
+                float temp = temp_raw / 1000.0f;
+                float humi = humi_raw / 1000.0f;
+                
+                if (temp >= -10 && temp <= 60 && humi >= 0 && humi <= 100) {
+                    pthread_mutex_lock(&state_mutex);
+                    g_state.last_temp = temp;
+                    g_state.last_humi = humi;
+                    pthread_mutex_unlock(&state_mutex);
+                    printf("[SENSOR] OK %.1f°C %.0f%%\n", temp, humi);
+                }
             }
         }
 
@@ -193,6 +198,7 @@ static void *thread_sensor(void *arg)
     printf("[SENSOR] thread exiting cleanly\n");
     return NULL;
 }
+
 
 static void *thread_display(void *arg)
 {
@@ -212,6 +218,20 @@ static void *thread_display(void *arg)
     write(oled_fd, "Init Sensor...\n", 15);
 
     while (running) {
+        pthread_mutex_lock(&state_mutex);
+
+        while (!g_state.system_on && running) {
+            pthread_mutex_unlock(&state_mutex);
+            write(btn_fd,  "0", 1);
+            write(oled_fd, " \n", 2); 
+            last_led_state = 0;
+            pthread_mutex_lock(&state_mutex);
+
+            pthread_cond_wait(&system_on_cond, &state_mutex);
+        }
+
+        if (!running) { pthread_mutex_unlock(&state_mutex); break; }
+
         struct timespec timeout;
         clock_gettime(CLOCK_REALTIME, &timeout);
         timeout.tv_nsec += 500000000LL;
@@ -219,7 +239,6 @@ static void *thread_display(void *arg)
             timeout.tv_sec++; timeout.tv_nsec -= 1000000000LL;
         }
 
-        pthread_mutex_lock(&state_mutex);
         pthread_cond_timedwait(&toggle_cond, &state_mutex, &timeout);
 
         int   sys_on = g_state.system_on;
@@ -227,16 +246,14 @@ static void *thread_display(void *arg)
         float humi   = g_state.last_humi;
         pthread_mutex_unlock(&state_mutex);
 
+        if (!sys_on) continue; 
+
         if (sys_on != last_led_state) {
-            write(btn_fd, sys_on ? "1" : "0", 1);
+            write(btn_fd, "1", 1);
             last_led_state = sys_on;
         }
 
-        if (!sys_on) {
-            write(oled_fd, " \n", 2); 
-            continue;
-        }
-
+        /* Hiển thị giao diện tối giản */
         snprintf(disp, sizeof(disp), "Temp: %.1f C\nHumi: %.0f %%\n", temp, humi);
         write(oled_fd, disp, strlen(disp));
     }
@@ -249,13 +266,12 @@ static void *thread_display(void *arg)
     return NULL;
 }
 
-
 int main(void)
 {
     pthread_t tid_btn, tid_sensor, tid_display;
     int ret;
 
-    printf("=== ENV Monitor System (Minimalist UI) ===\n");
+    printf("=== ENV Monitor (Minimalist UI + Thread Suspend) ===\n");
 
     if (pipe(wakeup_pipe) < 0) {
         perror("pipe");
@@ -276,8 +292,7 @@ int main(void)
     ret = pthread_create(&tid_display, NULL, thread_display, NULL);
     if (ret) { fprintf(stderr, "pthread_create display: %s\n", strerror(ret)); return 1; }
 
-    printf("Threads: BUTTON=%lu SENSOR=%lu DISPLAY=%lu\n",
-           tid_btn, tid_sensor, tid_display);
+    printf("Threads created. Press button to toggle. Ctrl+C to quit.\n");
 
     while (running)
         pause();
@@ -285,6 +300,7 @@ int main(void)
     printf("\nShutting down...\n");
     
     pthread_cond_broadcast(&toggle_cond);
+    pthread_cond_broadcast(&system_on_cond);
 
     pthread_join(tid_display, NULL);
     pthread_join(tid_sensor,  NULL);
@@ -294,6 +310,7 @@ int main(void)
     close(wakeup_pipe[1]);
     pthread_mutex_destroy(&state_mutex);
     pthread_cond_destroy(&toggle_cond);
+    pthread_cond_destroy(&system_on_cond); 
 
     printf("System stopped.\n");
     return 0;
