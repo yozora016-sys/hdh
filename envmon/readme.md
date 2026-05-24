@@ -14,3 +14,5 @@ b6:  clone mã nguồn về thư mục package trong buildroot
 
 
 b7:  vào menuconfig copy địa chỉ file rootfs-overlay vào mục root filesystem overlay director
+
+b8:  make 
