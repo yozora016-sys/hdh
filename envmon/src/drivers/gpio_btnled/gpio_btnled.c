@@ -172,21 +172,21 @@ static long btnled_ioctl(struct file *file, unsigned int cmd,
     return ret;
 }
 
-// static __poll_t btnled_poll(struct file *file, poll_table *wait)
-// {
-//     struct btnled_dev *dev = file->private_data;
-//     __poll_t mask = 0;
-//     unsigned long flags;
+static __poll_t btnled_poll(struct file *file, poll_table *wait)
+{
+     struct btnled_dev *dev = file->private_data;
+     __poll_t mask = 0;
+     unsigned long flags;
 
-//     poll_wait(file, &dev->wq, wait);
+     poll_wait(file, &dev->wq, wait);
 
-//     spin_lock_irqsave(&dev->lock, flags);
-//     if (dev->btn_event)
-//         mask |= EPOLLIN | EPOLLRDNORM;
-//     spin_unlock_irqrestore(&dev->lock, flags);
+     spin_lock_irqsave(&dev->lock, flags);
+     if (dev->btn_event)
+         mask |= EPOLLIN | EPOLLRDNORM;
+     spin_unlock_irqrestore(&dev->lock, flags);
 
-//     return mask;
-// }
+     return mask;
+ }
 
 static const struct file_operations btnled_fops = {
     .owner          = THIS_MODULE,
@@ -195,7 +195,7 @@ static const struct file_operations btnled_fops = {
     .read           = btnled_read,
     .write          = btnled_write,
     .unlocked_ioctl = btnled_ioctl,
-   // .poll           = btnled_poll,
+    .poll           = btnled_poll,
 };
 
 /* Module init/exit */
