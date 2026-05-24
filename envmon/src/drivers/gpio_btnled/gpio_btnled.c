@@ -303,6 +303,6 @@ module_init(btnled_init);
 module_exit(btnled_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Nhóm B22DCDT");
+MODULE_AUTHOR("Nhóm 10");
 MODULE_DESCRIPTION("GPIO Button & LED driver for BeagleBone Black");
 MODULE_VERSION("1.0");
