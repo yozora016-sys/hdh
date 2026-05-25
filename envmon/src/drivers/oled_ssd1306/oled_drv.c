@@ -423,6 +423,6 @@ module_init(oled_init);
 module_exit(oled_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Nhom B22DCDT - HDHN");
+MODULE_AUTHOR("Nhom 10");
 MODULE_DESCRIPTION("SSD1306 OLED I2C driver for BeagleBone Black");
 MODULE_VERSION("2.0");
